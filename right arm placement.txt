@@ -1,0 +1,40 @@
+			//**********************************************************************************************************************
+			//right arm upper working 
+			//**********************************************************************************************************************
+			rightArmPos.x=stage.width()/2+body.height()/3;
+			rightArmPos.y=stage.height()/2-body.height()/5;	
+			
+			dot(rightArmPos.x,rightArmPos.y,5,layer);
+			
+			//load in image and rotate it 180 and set the offset
+			var upperR=createNewKineticImageRotation(0,0,images.upperarm,180);
+			upperR.offset({x:upperR.width(),y:upperR.height()/2});
+			
+			//position the group			
+			RArmGroup=createGroup(rightArmPos.x,rightArmPos.y,0,0);				
+			
+			layer.add(RArmGroup);			
+			RArmGroup.add(upperR);						
+			
+			
+			
+			//forearm
+			var forearmR=createNewKineticImage(0,0,images.forearm);	
+			//forearm height needs adjustment
+			forearmR.offset({x:0,y:60});
+			
+			//adjustment needed in -x direction
+			forearmRGroup=createGroup(upperR.width(),0,0,0,0);	
+			
+			RArmGroup.add(forearmRGroup);			
+			forearmRGroup.add(forearmR);
+			
+
+			//hand
+			var HandPrevWidth=upperR.width()+forearmR.width();			
+			handRGroup=createGroup(0,0,0,0);	
+			var handR=createNewKineticImage(forearmR.width(),0,images.handr);				
+			//hand Y axis adjustment needed
+			handR.offset({x:0,y:handR.height()/2+30});			
+			forearmRGroup.add(handRGroup);
+			handRGroup.add(handR);

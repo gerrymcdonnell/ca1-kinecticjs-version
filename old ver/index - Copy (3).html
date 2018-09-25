@@ -1,0 +1,675 @@
+<html>
+<head>
+</head>
+
+<body>
+<script src="js/kinetic-v5.1.0.min.js">
+</script>
+
+<!-- add cordova js -->
+
+<div id="container"></div>
+
+<script>
+
+	  //global variables for body parts
+	  var stage;
+	  var layer;
+	  var head;
+	  var body;
+	  
+	  //load all the images
+      function loadImages(sources, callback) {
+        var images = {};
+        var loadedImages = 0;
+        var numImages = 0;
+        for(var src in sources) {
+          numImages++;
+        }
+        for(var src in sources) {
+          images[src] = new Image();
+          images[src].onload = function() {
+            if(++loadedImages >= numImages) {
+              callback(images);
+            }
+          };
+          images[src].src = sources[src];
+        }
+      }
+	  
+	  
+	  //set up the stage which holds the canvas
+      function initStage(images) {
+	  
+			/*
+			stage = new Kinetic.Stage({
+			  container: 'container',
+			  width: 800,
+			  height: 800,
+			});	
+			*/
+			
+			//the size of the window
+			var stage = new Kinetic.Stage({
+			  container: 'container',
+			  width: window.innerWidth,
+			  height: window.innerHeight,
+			});	
+			
+		  
+
+			var bodyPos=new Object();
+			bodyPos.x=0;
+			bodyPos.y=0;
+			
+			var headPos=new Object();
+			headPos.x=0;
+			headPos.y=0;
+			
+			//where the right arm starts
+			var rightArmPos=new Object();
+			rightArmPos.x=0;
+			rightArmPos.y=0;
+
+			var leftArmPos=new Object();
+			leftArmPos.x=0;
+			leftArmPos.y=0;	
+			
+			//legs
+			var leftLegPos=new Object();
+			leftLegPos.x=0;
+			leftLegPos.y=0;	
+
+			var rightLegPos=new Object();
+			rightLegPos.x=0;
+			rightLegPos.y=0;	
+			
+			layer = new Kinetic.Layer();
+			stage.add(layer);
+			
+			
+			
+			//**************************************************************************************************************
+			//base group to hold entire teddy
+			//baseGroup=createGroup(0,0,0,0);	
+			//**************************************************************************************************************
+			
+			
+
+			//**************************************************************************************************************
+			//HEAD
+			//**************************************************************************************************************
+			//put in center first
+			headPos.x=stage.width()/2;
+			headPos.y=stage.height()/2;
+			
+			head=createNewKineticImage(headPos.x,headPos.y,images.head);	
+			//scale the head 
+			head.scale({x:0.5,y:0.5});			
+			
+			//move the head into postion by setting its offset point
+			head.offsetX(head.width()/2);
+			head.offsetY(head.height());
+			head.move({x:0,y:-130});			
+			layer.add(head);
+			
+			//dot(headPos.x,headPos.y,5,layer);			
+			//**************************************************************************************************************		
+						
+			
+			
+			//add images
+			//**************************************************************************************************************
+			//BODY
+			//**************************************************************************************************************
+			//put body in middle
+			body=createNewKineticImage(stage.width()/2,stage.height()/2,images.body);
+			//set middle of canvas
+			bodyPos.x=stage.width()/2;
+			bodyPos.y=stage.height()/2;	
+			
+			//offset from 0,0 to center
+			body.offsetX(body.width()/2);
+			body.offsetY(body.height()/2);			
+			
+			layer.add(body);						
+			
+			//dot(bodyPos.x,bodyPos.y,5,layer);
+			//**************************************************************************************************************
+			//put head on top layer
+			head.moveToTop();
+			
+			//dot(bodyPos.x,bodyPos.y,5,layer);
+			//**************************************************************************************************************
+			
+			
+		
+			//**********************************************************************************************************************
+			//ARM
+			//calc arm start position			
+			
+			leftArmPos.x=stage.width()/2-body.height()/3;
+			leftArmPos.y=stage.height()/2-body.height()/5	
+			
+			dot(leftArmPos.x,leftArmPos.y,5,layer);						
+			
+			//create and load image
+			var upperL=createNewKineticImage(0,0,images.upperarm,0,0);			
+			//position the group
+			LArmGroup=createGroup(leftArmPos.x,leftArmPos.y,upperL.width(),upperL.height()/2);			
+		
+			layer.add(LArmGroup);			
+			LArmGroup.add(upperL);	
+
+			
+			
+			//forearm dot
+			dot(leftArmPos.x-upperL.width(),leftArmPos.y,5,layer);	
+
+			var forearmL=createNewKineticImageOffset(0,upperL.height()/2,images.forearm,290,upperL.height()/2);
+			
+			forearmLGroup=createGroup(0,0,0,0);	
+			LArmGroup.add(forearmLGroup);	
+			
+			forearmLGroup.add(forearmL);
+			
+			//medthod
+			//create a new group
+			//create image
+			//add the new group to the previous group
+			//add the image to new group
+			
+			
+			//hand
+			handLGroup=createGroup(0,0,0,0);	
+			var handL=createNewKineticImageOffset(-forearmL.width(),30,images.hand,180,95);
+			forearmLGroup.add(handLGroup);
+			handLGroup.add(handL);		
+
+			//**********************************************************************************************************************			
+			
+			
+			
+			
+			//**********************************************************************************************************************
+			//right arm upper
+			
+			rightArmPos.x=stage.width()/2+body.height()/3;
+			rightArmPos.y=stage.height()/2-body.height()/5;	
+			
+			//load in image and rotate it 180 and set the offset
+			var upperR=createNewKineticImageRotation(0,0,images.upperarm,180);
+			upperR.offset({x:upperR.width(),y:upperR.height()/2});
+			
+			//position the group			
+			RArmGroup=createGroup(rightArmPos.x,rightArmPos.y,0,0);				
+			
+			layer.add(RArmGroup);			
+			RArmGroup.add(upperR);
+			
+					
+			
+			
+			//forearm dot
+			//dot(rightArmPos.x+upperR.width(),rightArmPos.y,5,layer);			
+			
+			var forearmR=createNewKineticImage(0,0,images.forearm);	
+			//forearm height needs adjustment
+			forearmR.offset({x:0,y:60});
+			
+			//adjustment needed in -x direction
+			forearmRGroup=createGroup(upperR.width(),0,0,0,0);	
+			
+			RArmGroup.add(forearmRGroup);			
+			forearmRGroup.add(forearmR);
+			
+
+			//hand
+			var HandPrevWidth=upperR.width()+forearmR.width();
+			
+			handRGroup=createGroup(0,0,0,0);	
+			var handR=createNewKineticImage(forearmR.width(),0,images.handr);			
+			
+			//hand Y axis adjustment needed
+			handR.offset({x:0,y:handR.height()/2+30});
+			
+			forearmRGroup.add(handRGroup);
+			handRGroup.add(handR);
+			
+			//send right arm to bottom layer
+			RArmGroup.moveToBottom();
+			
+
+			//**********************************************************************************************************************
+			//LEGS
+			//**********************************************************************************************************************
+			//create a new group
+			//create image
+			//add the new group to the previous group
+			//add the image to new group
+			
+			//calculate postions
+			leftLegPos.x=stage.width()/2+body.width()*0.1;
+			leftLegPos.y=stage.height()/2+body.height()*0.35;
+			
+			rightLegPos.x=stage.width()/2-body.width()*0.1;
+			rightLegPos.y=leftLegPos.y;
+			
+			dot(leftLegPos.x,leftLegPos.y,5,layer);	
+			dot(rightLegPos.x,rightLegPos.y,5,layer);	
+			
+			
+			
+			//**********************************************************************************************************************
+			//left upper leg
+			//**********************************************************************************************************************
+			var UPPER_LEG_ADJUSTMENT=140;
+			//need to adjust leg x postion
+			var upperLegL=createNewKineticImageOffset(rightLegPos.x+UPPER_LEG_ADJUSTMENT,rightLegPos.y,images.leftupperleg,0,0);
+			//flip image
+			upperLegL.scale({x:-1});
+			layer.add(upperLegL);
+			//send the upper leg to bottom of layers
+			upperLegL.moveToBottom();
+			
+			
+			//left lowerleg
+			var lowerLegL=createNewKineticImageOffset(0,0,images.lowerleg,0,0);
+			leftLowerLegGroup=createGroup(leftLegPos.x-300,leftLegPos.y+upperLegL.height()-100,0,0);
+			layer.add(leftLowerLegGroup);
+			leftLowerLegGroup.add(lowerLegL);
+			
+			
+			//left foot
+			var footL=createNewKineticImageOffset(0,0,images.leftfoot,0,0);
+			leftFootGroup=createGroup(leftLegPos.x-320,leftLegPos.y+upperLegL.height()+upperLegL.height()-30,0,0);
+			layer.add(leftFootGroup);
+			//foot is too small,scale it up
+			footL.scale({x:2.8,y:2.8});
+			leftLowerLegGroup.add(footL);
+
+			
+			
+			//**********************************************************************************************************************
+			//right upper leg
+			var upperLegR=createNewKineticImageOffset(rightLegPos.x-20,rightLegPos.y,images.leftupperleg,0,0);						
+			layer.add(upperLegR);	
+			//send image to background
+			upperLegR.moveToBottom();
+			
+			
+			//right lowerleg
+			var lowerLegR=createNewKineticImageOffset(0,0,images.lowerleg,0,0);
+			rightLowerLegGroup=createGroup(leftLegPos.x,leftLegPos.y+upperLegR.height()-100,0,0);
+			layer.add(rightLowerLegGroup);
+			rightLowerLegGroup.add(lowerLegR);
+			
+			
+			//right foot
+			var footR=createNewKineticImageOffset(0,0,images.leftfoot,0,0);
+			rightFootGroup=createGroup(rightLegPos.x+80,rightLegPos.y+upperLegR.height()+upperLegR.height()-30,0,0);
+			layer.add(rightFootGroup);
+			//foot is too small,scale it up
+			footR.scale({x:2.8,y:2.8});
+			rightFootGroup.add(footR);
+			
+			
+			
+			//saving http://www.html5canvastutorials.com/kineticjs/html5-canvas-save-stage-as-json-string-with-kineticjs/
+			// save stage as a json string
+			//var json = stage.toJSON();
+			//console.log(json);
+			
+			
+			//body.moveToTop();
+			//upperLegR.moveToBottom();
+			
+			
+			//**********************************************************************************************************************
+			//events
+			/*
+			bind events to the node. KineticJS supports mouseover, mousemove, mouseout, mouseenter, mouseleave, mousedown, mouseup, click, dblclick, touchstart, touchmove, touchend, tap, 
+			dbltap, dragstart, dragmove, and dragend events. The Kinetic Stage supports contentMouseover, contentMousemove, contentMouseout, contentMousedown, contentMouseup, contentClick, 
+			contentDblclick, contentTouchstart, contentTouchmove, contentTouchend, contentTap, and contentDblTap. 
+			Pass in a string of events delimmited by a space to bind multiple events at once such as 'mousedown mouseup mousemove'. 
+			Include a namespace to bind an event by name such as 'click.foobar'.
+			*/
+			//**********************************************************************************************************************
+			
+			//rotate arm group
+			head.on('mousedown touchstart',function(evt) {		
+				this.rotateDeg(12);
+				layer.draw();
+			});			
+			
+			
+			//entire arm group rotates
+			upperL.on('mousedown',function(evt) {		
+				LArmGroup.rotateDeg(12);
+				layer.draw();
+			});
+			
+			
+			
+			forearmL.on('mousedown',function(evt) {		
+				forearmLGroup.rotateDeg(12);
+				
+				console.log(forearmLGroup.offsetX())
+				console.log(forearmLGroup.offsetY())
+				
+				//forearmL.rotateDeg(12);
+				layer.draw();
+			});
+			
+			
+			
+			handL.on('mousedown',function(evt) {		
+				handL.rotateDeg(12);
+				layer.draw();
+			});			
+			
+			
+			
+			
+			upperR.on('mousedown touchstart',function(evt) {		
+				RArmGroup.rotateDeg(12);
+				layer.draw();
+			});
+			
+			
+			forearmR.on('mousedown',function(evt) {		
+				forearmRGroup.rotateDeg(12);
+				layer.draw();
+			});
+			
+			
+			handR.on('mousedown',function(evt) {		
+				handR.rotateDeg(12);
+				layer.draw();
+			});
+			
+			
+			
+			
+			//****************************************************************************************************************************************
+			//LEGs
+			//LLegGroup			
+			leftLowerLegGroup.on('mousedown',function(evt) {		
+				leftFootGroup.rotateDeg(12);
+				
+
+				
+				layer.draw();
+			});
+			
+			//just rotate foot
+			footL.on('mousedown',function(evt) {		
+				this.rotateDeg(12);
+				layer.draw();
+			});
+			
+			
+			//RIGHT
+			rightLowerLegGroup.on('mousedown',function(evt) {		
+				this.rotateDeg(12);
+				layer.draw();
+			});
+			
+			
+			
+			
+
+			
+
+			
+			scale_stage(stage,0.6);
+			
+			stage.draw();
+			
+			
+
+			
+        };//end of stage init
+		
+		
+		
+		function createNewKineticImageRotation(x,y,imgObject,rotateAng)
+		{
+			var newImg = new Kinetic.Image({
+			  x: x,
+			  y: y,
+			  image: imgObject,
+			  rotation: rotateAng,
+			  name: 'image'
+			})
+			return newImg;
+		}
+		
+		
+
+		
+		
+		function scale_stage(stage,val)
+		{
+			//test scale
+			stage.scale({x:val,y:val});
+		}
+		
+
+		
+		function createGroup(x,y,offsetx,offsety)
+		{
+			var myGroup=new Kinetic.Group({
+			  x: 	x,
+			  y:	y,
+			  rotation:0,
+			  offset:{x:offsetx,y:offsety}
+			});
+			return myGroup;
+		}
+		
+		
+		
+		
+	function getCenter(){
+		var p=new Object();
+		p.y=stage.height()/2;
+		p.x=stage.width()/2;		
+		return p;
+	}
+		
+		
+		
+	function dot(x,y,radius,layer){
+	  var c=new Kinetic.Circle({x:x,y:y,radius:radius,fill:"red"});
+	  //console.log("Dot @ " +x + " , " + y);
+	  layer.add(c);
+	  layer.draw();
+	  return(c);
+	}
+
+
+	
+
+	 //create a new kinectic image object
+	  function createNewKineticImage(x,y,imgObject)
+	  {
+	  	var newImg = new Kinetic.Image({
+          x: x,
+          y: y,
+          image: imgObject,
+          name: 'image'
+        })
+		return newImg;
+	  }
+	  
+	  function createNewKineticImageOffset(x,y,imgObject,offX,offY)
+	  {
+	  	var newImg = new Kinetic.Image({
+          x: x,
+          y: y,
+          image: imgObject,
+          name: 'image',
+		  offset: {x:offX, y:offY}
+        })
+		return newImg;
+	  }
+
+
+
+      var sources = {
+        body: 'teddybear_gfx/body.png',
+		forearm: 'teddybear_gfx/forearm.png',
+		upperarm: 'teddybear_gfx/lowerarm.png',
+		hand: 'teddybear_gfx/hand.png',
+		handr: 'teddybear_gfx/handr.png',
+		head: 'teddybear_gfx/head.png',
+		leftupperleg: 'teddybear_gfx/leftupperleg.png',
+		lowerleg: 'teddybear_gfx/leftlowerleg.png',
+		leftfoot: 'teddybear_gfx/leftfoot.png'		
+      };	    
+	  
+	  
+	  
+	  //load the images and stage
+      loadImages(sources, initStage);
+	  
+	  var json;
+	  var mylayers=[];
+
+	  
+	   //hide arms and body  eg
+	   
+	   function hide_body_parts()
+	   {
+			//body.hide();
+			//head.hide();			
+			//body.show();
+			//body.show();
+			
+			if(body.visible())
+			{
+				body.visible(false);
+			}
+			else
+			{
+				body.visible(true);
+			}
+			
+			//redraw everything
+			stage.draw();
+	   }
+	  
+	  
+	  function test_anim_head()
+	  {	  
+
+		// Set speed of disc; 1 revolution per 1 seconds
+        var angularSpeed = Math.PI / 1;
+ 
+        var anim = new Kinetic.Animation(function(frame) {
+        var angleDiff = frame.timeDiff * angularSpeed / 500;  
+		head.rotate(angleDiff);
+        }, layer);
+		anim.start();
+	  }
+	  
+	  
+	  function saveframe()
+	  {
+		/*alert("test");
+		//json = stage.toJSON();
+		json = layer.toJSON();
+		console.log(json);	*/
+		
+		//save current layer as a frame
+		var currentlayer = new Kinetic.Layer();
+		currentlayer=layer;
+		mylayers.push(currentlayer);
+		
+		console.log("saved frame");
+	  }
+	  
+	  
+	  function testanim()
+	  {
+		stage.clear();
+		layer.visible(false);
+		console.log(layer.toDataURL());
+		
+		stage.add(mylayers[1]);
+		console.log(mylayers[1]);
+		stage.draw();
+		
+	  }
+	  
+	  function testclear(){
+		var oldlayer;
+		oldlayer=layer;
+		
+		//stage.clear();		
+		layer.clear();
+		
+		//stage.add(oldlayer);
+		
+		console.log("clear");
+	  }
+	  
+	  
+	  
+
+</script>
+
+
+<p>
+<button type="button" onclick="saveframe()">save</button>
+<button type="button" onclick="testanim()">anim</button>
+<button type="button" onclick="test_anim_head()">anim head</button>
+<button type="button" onclick="testclear()">clear</button>
+<button type="button" onclick="hide_body_parts()">hide body</button>
+
+</p>
+
+
+<script> 
+
+	
+
+	/*
+	function test_save()
+	{
+		alert("dfgsdfgdfg");
+		
+		var canvas = document.getElementById('container');
+
+			//var json = stage.toJSON();
+			//console.log(json);
+		
+		 // use getContext to use the canvas for drawing
+		 var ctx = canvas.getContext('2d');
+		 
+		 //  Save the default state
+		 ctx.save(); 
+		 
+	}     
+	
+	
+	function test_load()
+	{
+		alert("dfgsdfgdfg");
+		
+		var canvas = document.getElementById('container');
+
+
+		 // use getContext to use the canvas for drawing
+		 var ctx = canvas.getContext('2d');
+		 
+		// Restore original state
+		ctx.restore();
+		 
+	}  
+	
+	*/
+</script>
+</body>
+</html>
